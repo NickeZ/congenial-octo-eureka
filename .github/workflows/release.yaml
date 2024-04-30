@@ -6,6 +6,17 @@ on:
         type: string
         required: false
 jobs:
+  create-release-candidate-branch:
+    runs-on: ubuntu-latest
+      - uses: actions/checkout@v4
+      - name: set version from source code
+        run: |
+          awk '/version/ {print "version="$2+1}' README.md >> "$GITHUB_ENV"
+      - name: copy branch from tip and push as a release branch
+        run: |
+          git branch -c v$version-0-0
+          git push origin v$version-0-0
+
   make-release:
     runs-on: ubuntu-latest
     steps:
