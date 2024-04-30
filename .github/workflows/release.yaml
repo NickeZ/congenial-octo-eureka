@@ -30,8 +30,8 @@ jobs:
       - name: set major version from inputs
         if: inputs.bump-major == true
         run: |
-          echo MAJOR=$(( $MAJOR + 1)) >> "GITHUB_ENV"
-          echo MINOR=0 >> "GITHUB_ENV"
+          echo MAJOR=$(( $MAJOR + 1)) >> "$GITHUB_ENV"
+          echo MINOR=0 >> "$GITHUB_ENV"
       - name: Setup git
         run: |
           git config --global user.name "Safello Github Action runner"
