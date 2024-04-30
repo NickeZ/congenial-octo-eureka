@@ -1,0 +1,7 @@
+name: release
+on: [workflow_dispatch]
+jobs:
+  make-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
