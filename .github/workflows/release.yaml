@@ -5,8 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: create feature branch
+      - name: Setup git
         run: |
+          git config --global user.name "Safello Github Action runner"
+          git config --global user.email "noreply@safello.com"
           git checkout -b bump-version
       - name: update version
         run: |
