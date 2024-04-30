@@ -28,7 +28,7 @@ jobs:
           echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md))) >> "$GITHUB_ENV"
           echo MINOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\2/p' README.md) + 1 )) >> "$GITHUB_ENV"
       - name: set major version from inputs
-        if: inputs.bump-major
+        if: inputs.bump-major == true
         run: |
           echo MAJOR=$(( $MAJOR + 1)) >> "GITHUB_ENV"
           echo MINOR=0 >> "GITHUB_ENV"
