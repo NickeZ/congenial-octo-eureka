@@ -22,3 +22,5 @@ jobs:
       - name: create pr
         run: |
           gh pr create -B main -H bump-version --title "Bump version PR" --body "Created by Github Action"
+        env:
+          GH_TOKEN: ${{ github.token }}
