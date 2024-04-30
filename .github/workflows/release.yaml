@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: set version from env
+      - name: set version from source code
         if: inputs.version == ''
         run: |
-          awk '/version/ {print "version="$2}' README.md >> "$GITHUB_ENV"
+          awk '/version/ {print "version="$2+1}' README.md >> "$GITHUB_ENV"
       - name: set version from inputs
         if: inputs.version != ''
         run: |
