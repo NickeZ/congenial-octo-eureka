@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: set version from source code
         run: |
-          awk '/version/ {print "version="$2+1}' README.md >> "$GITHUB_ENV"
+          awk '/version/ {print "version="$2}' README.md >> "$GITHUB_ENV"
       - name: copy branch from tip and push as a release branch
         run: |
           git branch -c release/$version-0
