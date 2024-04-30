@@ -27,8 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: set version from source code
         run: |
-          echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md) + 1 )) >> "$GITHUB_ENV"
-          echo MINOR=0 >> "$GITHUB_ENV"
+          echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md))) >> "$GITHUB_ENV"
+          echo MINOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\2/p' README.md) + 1 )) >> "$GITHUB_ENV"
       - name: set major version from inputs
         if: inputs.version-major != ''
         run: |
