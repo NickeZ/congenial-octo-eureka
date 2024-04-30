@@ -2,18 +2,16 @@ name: release
 on:
   workflow_dispatch:
     inputs:
-      version-major:
-        type: string
-        required: false
-      version-minor:
-        type: string
-        required: false
+      bump-major:
+        type: boolean
+        required: true
+        default: false
 jobs:
   create-release-candidate-branch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: set version from source code
+      - name: read version from source code
         run: |
           sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/MAJOR=\1\nMINOR=\2/p' README.md >> "$GITHUB_ENV"
       - name: copy branch from tip and push as a release branch
@@ -30,13 +28,10 @@ jobs:
           echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md))) >> "$GITHUB_ENV"
           echo MINOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\2/p' README.md) + 1 )) >> "$GITHUB_ENV"
       - name: set major version from inputs
-        if: inputs.version-major != ''
+        if: inputs.bump-major
         run: |
-          echo "MAJOR=${{ inputs.version-major }}" >> "$GITHUB_ENV"
-      - name: set minor version from inputs
-        if: inputs.version-minor != ''
-        run: |
-          echo "MINOR=${{ inputs.version-minor }}" >> "$GITHUB_ENV"
+          echo MAJOR=$(( $MAJOR + 1)) >> "GITHUB_ENV"
+          echo MINOR=0 >> "GITHUB_ENV"
       - name: Setup git
         run: |
           git config --global user.name "Safello Github Action runner"
