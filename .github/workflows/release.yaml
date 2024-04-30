@@ -33,6 +33,6 @@ jobs:
           git push origin bump-version-$version
       - name: create pr
         run: |
-          gh pr create -B main -H bump-version-$version --title "Bump version PR" --body "Created by Github Action"
+          gh pr create -B main -H bump-version-$version --title "Bump version to $version" --body "Created by Github Action"
         env:
           GH_TOKEN: ${{ github.token }}
