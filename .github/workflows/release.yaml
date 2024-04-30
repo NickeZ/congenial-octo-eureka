@@ -1,24 +1,34 @@
 name: release
-on: [ workflow_dispatch ]
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: false
 jobs:
   make-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: set version from env
+        if: ${{ inputs.version }} == ''
+          awk '/version/ {print "VERSION="$2}' README.md > $GITHUB_ENV
+      - name: set version from inputs
+        if: ${{ inputs.version }} != ''
+          echo "VERSION=${{ inputs.version }}" > $GITHUB_ENV
       - name: Setup git
         run: |
           git config --global user.name "Safello Github Action runner"
           git config --global user.email "noreply@safello.com"
-          git checkout -b bump-version
+          git checkout -b bump-version-${{ env.VERSION }}
       - name: update version
         run: |
-          awk '/version/ {$2+=1} 1' README.md > tmp
-          mv tmp README.md
+          sed -i '/version.*/version ${{ env.VERSION }}/' README.md
       - name: commit
         run: |
           git add README.md
           git commit -m "[AUTO-COMMIT] Bump version"
-          git push origin bump-version
+          git push origin bump-version-${{ env.VERSION }}
       - name: create pr
         run: |
           gh pr create -B main -H bump-version --title "Bump version PR" --body "Created by Github Action"
