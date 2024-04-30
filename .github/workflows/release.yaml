@@ -11,28 +11,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: set version from env
-        if: ${{ inputs.version }} == ''
+        if: inputs.version == ''
         run: |
-          awk '/version/ {print "VERSION="$2}' README.md > $GITHUB_ENV
+          awk '/version/ {print "version="$2}' README.md >> "$GITHUB_ENV"
       - name: set version from inputs
-        if: ${{ inputs.version }} != ''
+        if: inputs.version != ''
         run: |
-          echo "VERSION=${{ inputs.version }}" > $GITHUB_ENV
+          echo "version=${{ inputs.version }}" >> "$GITHUB_ENV"
       - name: Setup git
         run: |
           git config --global user.name "Safello Github Action runner"
           git config --global user.email "noreply@safello.com"
-          git checkout -b bump-version-${{ env.VERSION }}
+          git checkout -b bump-version-$version
       - name: update version
         run: |
-          sed -i '/version.*/version ${{ env.VERSION }}/' README.md
+          sed -i "/version.*/version $version/" README.md
       - name: commit
         run: |
           git add README.md
           git commit -m "[AUTO-COMMIT] Bump version"
-          git push origin bump-version-${{ env.VERSION }}
+          git push origin bump-version-$version
       - name: create pr
         run: |
-          gh pr create -B main -H bump-version --title "Bump version PR" --body "Created by Github Action"
+          gh pr create -B main -H bump-version-$version --title "Bump version PR" --body "Created by Github Action"
         env:
           GH_TOKEN: ${{ github.token }}
