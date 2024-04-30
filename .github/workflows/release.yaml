@@ -14,10 +14,10 @@ jobs:
           awk '/version/ {print "version="$2+1}' README.md >> "$GITHUB_ENV"
       - name: copy branch from tip and push as a release branch
         run: |
-          git branch -c v$version-0-0
-          git push origin v$version-0-0
+          git branch -c release/$version-0
+          git push origin release/$version-0
 
-  make-release:
+  bump-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
