@@ -12,9 +12,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: set version from env
         if: ${{ inputs.version }} == ''
+        run: |
           awk '/version/ {print "VERSION="$2}' README.md > $GITHUB_ENV
       - name: set version from inputs
         if: ${{ inputs.version }} != ''
+        run: |
           echo "VERSION=${{ inputs.version }}" > $GITHUB_ENV
       - name: Setup git
         run: |
