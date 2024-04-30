@@ -1,7 +1,22 @@
 name: release
-on: [workflow_dispatch]
+on: [ workflow_dispatch ]
 jobs:
   make-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: create feature branch
+        run: |
+          git checkout -b bump-version
+      - name: update version
+        run: |
+          awk '/version/ {$2+=1} 1' README.md > tmp
+          mv tmp README.md
+      - name: commit
+        run: |
+          git add README.md
+          git commit -m "[AUTO-COMMIT] Bump version"
+          git push origin bump-version
+      - name: create pr
+        run: |
+          gh pr create -B main -H bump-version --title "Bump version PR" --body "Created by Github Action"
