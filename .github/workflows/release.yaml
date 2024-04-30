@@ -2,7 +2,10 @@ name: release
 on:
   workflow_dispatch:
     inputs:
-      version:
+      version-major:
+        type: string
+        required: false
+      version-minor:
         type: string
         required: false
 jobs:
@@ -12,32 +15,36 @@ jobs:
       - uses: actions/checkout@v4
       - name: set version from source code
         run: |
-          awk '/version/ {print "version="$2}' README.md >> "$GITHUB_ENV"
+          sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/MAJOR=\1\nMINOR=\2/p' README.md >> "$GITHUB_ENV"
       - name: copy branch from tip and push as a release branch
         run: |
-          git branch -c release/$version-0
-          git push origin release/$version-0
+          git branch -c release/$MAJOR-$MINOR
+          git push origin release/$MAJOR-$MINOR
 
   bump-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: set version from source code
-        if: inputs.version == ''
         run: |
-          awk '/version/ {print "version="$2+1}' README.md >> "$GITHUB_ENV"
-      - name: set version from inputs
-        if: inputs.version != ''
+          echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md) + 1 )) >> "$GITHUB_ENV"
+          echo MINOR=0 >> "$GITHUB_ENV"
+      - name: set major version from inputs
+        if: inputs.version-major != ''
         run: |
-          echo "version=${{ inputs.version }}" >> "$GITHUB_ENV"
+          echo "MAJOR=${{ inputs.version-major }}" >> "$GITHUB_ENV"
+      - name: set minor version from inputs
+        if: inputs.version-minor != ''
+        run: |
+          echo "MINOR=${{ inputs.version-minor }}" >> "$GITHUB_ENV"
       - name: Setup git
         run: |
           git config --global user.name "Safello Github Action runner"
           git config --global user.email "noreply@safello.com"
-          git checkout -b bump-version-$version
+          git checkout -b bump-version-$MAJOR-$MINOR
       - name: update version
         run: |
-          sed -i "s/version.*/version $version/" README.md
+          sed -i "s/version.*/version $MAJOR.$MINOR/" README.md
       - name: commit
         run: |
           git add README.md
