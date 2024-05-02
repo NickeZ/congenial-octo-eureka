@@ -33,7 +33,7 @@ jobs:
           EOF
       - name: read version from source code
         run: |
-          sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/MAJOR=\1\nMINOR=\2/p' README.md >> "$GITHUB_ENV"
+          sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/MAJOR=\1\nMINOR=\2/p' README.md >> "$GITHUB_ENV"
       - name: copy branch from tip and push as a release branch
         run: |
           git branch -c release/$MAJOR-$MINOR
