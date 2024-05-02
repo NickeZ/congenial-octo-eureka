@@ -26,6 +26,11 @@ jobs:
     if: github.ref_name == 'main'
     steps:
       - uses: actions/checkout@v4
+      - name: print context
+        run: |
+          cat << EOF
+          ${{ github }}
+          EOF
       - name: read version from source code
         run: |
           sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/MAJOR=\1\nMINOR=\2/p' README.md >> "$GITHUB_ENV"
