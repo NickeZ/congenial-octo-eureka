@@ -1,4 +1,18 @@
-name: release
+---
+
+# Bump version and create release branch
+#
+# If this workflow is triggered from the 'main' branch, it will create a new
+# branch called 'release/X.Y.Z', where X.Y.Z is the current version. Afterwards
+# it will bump the minor version and create a pull request for that commit.
+#
+# Using the 'bump-major' option you can bump the major version instead of the
+# minor. The minor will then get set to 0.
+#
+# If this workflow is triggered from a 'release/Z.Y.Z' branch, it will bump the
+# patch version.
+
+name: Bump version
 on:
   workflow_dispatch:
     inputs:
@@ -9,6 +23,7 @@ on:
 jobs:
   create-release-candidate-branch:
     runs-on: ubuntu-latest
+    if: github.ref_name == 'main'
     steps:
       - uses: actions/checkout@v4
       - name: read version from source code
@@ -23,12 +38,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: set version from source code
+      - name: Set version from source code and bump Patch version
         run: |
-          echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md))) >> "$GITHUB_ENV"
-          echo MINOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\2/p' README.md) + 1 )) >> "$GITHUB_ENV"
-      - name: set major version from inputs
-        if: inputs.bump-major == true
+          echo MAJOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\1/p' README.md))) >> "$GITHUB_ENV"
+          echo MINOR=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\2/p' README.md))) >> "$GITHUB_ENV"
+          echo PATCH=$(($(sed -E -n 's/^version (0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)\.(0|[1-9][[:digit:]]*)/\3/p' README.md) + 1 )) >> "$GITHUB_ENV"
+      - name: Bump Minor version
+        if: github.ref_name == 'main'
+        run: |
+          echo MINOR=$(( $MAJOR + 1)) >> "$GITHUB_ENV"
+          echo PATCH=0 >> "$GITHUB_ENV"
+      - name: Bump Major version
+        if: github.ref_name == 'main' && inputs.bump-major == true
         run: |
           echo MAJOR=$(( $MAJOR + 1)) >> "$GITHUB_ENV"
           echo MINOR=0 >> "$GITHUB_ENV"
@@ -36,17 +57,17 @@ jobs:
         run: |
           git config --global user.name "Safello Github Action runner"
           git config --global user.email "noreply@safello.com"
-          git checkout -b bump-version-$MAJOR-$MINOR
+          git checkout -b bump-version-$MAJOR-$MINOR-$PATCH
       - name: update version
         run: |
-          sed -i "s/version.*/version $MAJOR.$MINOR/" README.md
+          sed -i "s/version.*/version $MAJOR.$MINOR.$PATCH/" README.md
       - name: commit
         run: |
           git add README.md
           git commit -m "[AUTO-COMMIT] Bump version"
-          git push origin bump-version-$MAJOR-$MINOR
+          git push origin bump-version-$MAJOR-$MINOR-$PATCH
       - name: create pr
         run: |
-          gh pr create -B main -H bump-version-$MAJOR-$MINOR --title "Bump version to $MAJOR.$MINOR" --body "Created by Github Action"
+          gh pr create -B ${{ github.ref_name }} -H bump-version-$MAJOR-$MINOR --title "Bump version to $MAJOR.$MINOR" --body "Created by Github Action"
         env:
           GH_TOKEN: ${{ github.token }}
