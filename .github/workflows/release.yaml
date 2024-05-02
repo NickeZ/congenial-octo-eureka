@@ -51,7 +51,7 @@ jobs:
       - name: Bump Minor version
         if: github.ref_name == 'main'
         run: |
-          echo MINOR=$(( $MAJOR + 1)) >> "$GITHUB_ENV"
+          echo MINOR=$(( $MINOR + 1)) >> "$GITHUB_ENV"
           echo PATCH=0 >> "$GITHUB_ENV"
       - name: Bump Major version
         if: github.ref_name == 'main' && inputs.bump-major == true
