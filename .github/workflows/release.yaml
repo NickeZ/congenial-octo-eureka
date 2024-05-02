@@ -73,6 +73,6 @@ jobs:
           git push origin bump-version-$MAJOR-$MINOR-$PATCH
       - name: create pr
         run: |
-          gh pr create -B ${{ github.ref_name }} -H bump-version-$MAJOR-$MINOR --title "Bump version to $MAJOR.$MINOR" --body "Created by Github Action"
+          gh pr create -B ${{ github.ref_name }} -H bump-version-$MAJOR-$MINOR-$PATCH --title "Bump version to $MAJOR.$MINOR.$PATCH" --body "Created by Github Action"
         env:
           GH_TOKEN: ${{ github.token }}
